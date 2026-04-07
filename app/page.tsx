@@ -29,9 +29,14 @@ export default function Home() {
         ): (
           <>
             <h1 className="text-3xl font-bold">Welcome {session.user.name}</h1>
-            <BetterAuthActionButton size="lg" variant="destructive" action={() => authClient.signOut()}>
-              Sign Out
-            </BetterAuthActionButton>
+            <div className="flex gap-4 justify-center">
+              <Button asChild size="lg">
+                <Link href={'/profile'}>Profile</Link>
+              </Button>
+              <BetterAuthActionButton size="lg" variant="destructive" action={() => authClient.signOut()}>
+                Sign Out
+              </BetterAuthActionButton>
+            </div>
           </>
         )}
       </div>

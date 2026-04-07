@@ -14,26 +14,28 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
-import { PasswordInput } from "@/components/ui/password-input";
 import { LoadingSwap } from "@/components/ui/loading-swap";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { NumberInput } from "@/components/ui/number-input";
 
-const signUpSchema = z.object({
+const profileUpdateSchema = z.object({
     name: z.string().min(1),
     email: z.email().min(1),
-    password: z.string().min(6),
     favoriteNumber: z.number().int(),
 });
 
-type SignUpForm = z.infer<typeof signUpSchema>;
+type ProfileUpdateForm = z.infer<typeof profileUpdateSchema>;
 
-export function SignUpTab({
-    openVerificationEmailTab,
-}: {
-    openVerificationEmailTab: (email: string) => void;
+export function ProfileUpdateForm({
+    user,
+}: {    
+    user: {
+        name: string;
+        email: string;
+        favoriteNumber: number;
+    }
 }) {
     const router = useRouter();
     const {
@@ -41,29 +43,52 @@ export function SignUpTab({
         handleSubmit,
         control,
         formState: { errors, isSubmitting },
-    } = useForm<SignUpForm>({
-        resolver: zodResolver(signUpSchema),
+    } = useForm<ProfileUpdateForm>({
+        resolver: zodResolver(profileUpdateSchema),
         defaultValues: {
-            name: "",
-            email: "",
-            password: "",
-            favoriteNumber: 0,
+            name: user.name,
+            email: user.email,
+            favoriteNumber: user.favoriteNumber,
         },
     });
 
-    async function handleSignUp(data: SignUpForm) {
-        const result = await authClient.signUp.email({ ...data, callbackURL: "/"}, {
-            onError: (error) => {
-                toast.error(error.error.message || "Failed to sign up");
-            }
-        })
+    async function handleProfileUpdate(data: ProfileUpdateForm) {
+        const promises = [
+            authClient.updateUser({
+                name: data.name,
+                favoriteNumber: data.favoriteNumber,
+            })
+        ]
 
-        if (result.error == null && !result.data.user.emailVerified) {
-            openVerificationEmailTab(data.email)
+        if (data.email !== user.email) {
+            promises.push(
+                authClient.changeEmail({
+                    newEmail: data.email,
+                    callbackURL: "/profile",
+                })
+            )
+        }
+
+        const res = await Promise.all(promises)
+
+        const updateUserResult = res[0]
+        const emailResult = res[1] ?? { error: false }
+
+        if (updateUserResult.error) {
+            toast.error(updateUserResult.error.message || "Failed to update profile")
+        } else if (emailResult.error) {
+            toast.error(emailResult.error.message || "Failed to change email")
+        } else {
+            if (data.email !== user.email) {
+                toast.success("Verify your new email address to complete the change.")
+            } else {
+                toast.success("Profile updated successfully")
+            }
+            router.refresh()
         }
     }
     return (
-        <form onSubmit={handleSubmit(handleSignUp)} className="space-y-6">
+        <form onSubmit={handleSubmit(handleProfileUpdate)} className="space-y-6">
             <FieldSet>
                 <FieldGroup>
                     {/* name */}
@@ -90,19 +115,6 @@ export function SignUpTab({
                         {errors.email && <FieldError>{errors.email.message}</FieldError>}
                     </Field>
 
-                    {/* password */}
-                    <Field>
-                        <FieldLabel>Password</FieldLabel>
-                        <FieldContent>
-                            <PasswordInput
-                                placeholder="Enter your password"
-                                {...register("password")}
-                            />
-                        </FieldContent>
-
-                        {errors.password && <FieldError>{errors.password.message}</FieldError>}
-                    </Field>
-
                     {/* favorite number */}
                     <Field>
                         <FieldLabel>Favorite Number</FieldLabel>
@@ -127,7 +139,7 @@ export function SignUpTab({
 
             <Button type="submit" className="w-full" disabled={isSubmitting}>
                 <LoadingSwap isLoading={isSubmitting}>
-                    Sign Up
+                    Update Profile
                 </LoadingSwap>
             </Button>
         </form>

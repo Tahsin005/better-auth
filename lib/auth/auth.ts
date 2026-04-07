@@ -6,11 +6,25 @@ import { sendEmailVerificationEmail } from "../emails/email-verification";
 import { sendPasswordResetEmail } from "../emails/password-reset-emai";
 import { createAuthMiddleware } from "better-auth/api";
 import { sendWelcomeEmail } from "../emails/welcome-email";
-import { fa } from "zod/locales";
-import { profile } from "console";
 
 export const auth = betterAuth({
     user: {
+        changeEmail: {
+            enabled: true,
+            sendChangeEmailVerification: async ({ user, url, newEmail }: {
+                user: {
+                    name: string;
+                    email: string;
+                },
+                url: string;
+                newEmail: string;
+            }) => {
+                await sendEmailVerificationEmail({
+                    user: { ...user, email: newEmail },
+                    url,
+                })
+            },
+        },
         additionalFields: {
             favoriteNumber: {
                 type: "number",
