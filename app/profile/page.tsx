@@ -1,12 +1,15 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { auth } from "@/lib/auth/auth";
-import { ArrowLeft, Key, LinkIcon, Shield, Trash2, User } from "lucide-react";
+import { ArrowLeft, Key, LinkIcon, Loader2Icon, Shield, Trash2, User } from "lucide-react";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ProfileUpdateForm } from "./_components/profile-update-form";
+import { ReactNode, Suspense } from "react";
+import { ChangePasswordForm } from "./_components/change-password-form";
+import { SetPasswordButton } from "./_components/set-password-button";
 
 export default async function ProfilePage() {
     const session = await auth.api.getSession({
@@ -78,7 +81,65 @@ export default async function ProfilePage() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+
+                <TabsContent value="security">
+                    <Card>
+                        <CardContent>
+                            <LoadingSuspense>
+                                <SecurityTab
+                                    email={session.user.email}
+                                />
+                            </LoadingSuspense>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
         </div>
+    )
+}
+
+async function SecurityTab({
+  email,
+}: {
+  email: string
+}) {
+    const accounts = await auth.api.listUserAccounts({ headers: await headers() })
+    const hasPasswordAccount = accounts.some(a => a.providerId === "credential")
+    return (
+        <div className="space-y-6">
+            {hasPasswordAccount ?  (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Change Password</CardTitle>
+                        <CardDescription>
+                        Update your password for improved security.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ChangePasswordForm />
+                    </CardContent>
+                </Card>
+            ): (
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Set Password</CardTitle>
+                        <CardDescription>
+                        We will send you a password reset email to set up a password.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <SetPasswordButton email={email} />
+                    </CardContent>
+                </Card>
+            )}
+        </div>
+    )
+}
+
+function LoadingSuspense({ children }: { children: ReactNode }) {
+    return (
+        <Suspense fallback={<Loader2Icon className="size-20 animate-spin" />}>
+            {children}
+        </Suspense>
     )
 }
