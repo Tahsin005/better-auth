@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,14 +16,16 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { LoadingSwap } from "@/components/ui/loading-swap";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { NumberInput } from "@/components/ui/number-input";
 
 const signUpSchema = z.object({
     name: z.string().min(1),
     email: z.email().min(1),
     password: z.string().min(6),
+    favoriteNumber: z.number().int(),
 });
 
 type SignUpForm = z.infer<typeof signUpSchema>;
@@ -37,6 +39,7 @@ export function SignUpTab({
     const {
         register,
         handleSubmit,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<SignUpForm>({
         resolver: zodResolver(signUpSchema),
@@ -44,6 +47,7 @@ export function SignUpTab({
             name: "",
             email: "",
             password: "",
+            favoriteNumber: 0,
         },
     });
 
@@ -96,7 +100,26 @@ export function SignUpTab({
                             />
                         </FieldContent>
 
-                        {errors.password && <FieldError>{errors.password.message}</FieldError>}
+                    {/* favorite number */}
+                    <Field>
+                        <FieldLabel>Favorite Number</FieldLabel>
+                        <FieldContent>
+                            <Controller
+                                name="favoriteNumber"
+                                control={control}
+                                render={({ field }) => (
+                                    <NumberInput
+                                        placeholder="Enter your favorite number"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    />
+                                )}
+                            />
+                        </FieldContent>
+
+                        {errors.favoriteNumber && <FieldError>{errors.favoriteNumber.message}</FieldError>}
+                    </Field>
+                        {errors.favoriteNumber && <FieldError>{errors.favoriteNumber.message}</FieldError>}
                     </Field>
                 </FieldGroup>
             </FieldSet>
