@@ -37,10 +37,17 @@ export function OrganizationSelect() {
             <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select an organization" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent
+                position="popper"
+                align="start"
+                sideOffset={4}
+                className="max-h-72 w-(--radix-select-trigger-width)"
+            >
                 {organizations.map(org => (
                     <SelectItem key={org.id} value={org.id}>
-                        {org.name}
+                        <span className="block truncate" title={org.name}>
+                            {org.name}
+                        </span>
                     </SelectItem>
                 ))}
             </SelectContent>

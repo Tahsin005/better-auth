@@ -13,6 +13,7 @@ import { ac, admin, user } from "@/components/auth/permissions"
 import { sendOrganizationInviteEmail } from "../emails/organization-invite-email";
 
 export const auth = betterAuth({
+    appName: "Better Auth Implementation",
     user: {
         changeEmail: {
             enabled: true,
