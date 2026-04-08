@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { ImpersonationIndicator } from "@/components/auth/impersonation-indicator";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -29,6 +30,7 @@ export default function RootLayout({
       >
         {children}
         <Toaster />
+        <ImpersonationIndicator />
       </body>
     </html>
   );
