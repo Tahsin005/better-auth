@@ -10,6 +10,7 @@ import { sendDeleteAccountVerificationEmail } from "../emails/delete-account-ver
 import { twoFactor, admin as adminPlugin, organization } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey"
 import { ac, admin, user } from "@/components/auth/permissions"
+import { sendOrganizationInviteEmail } from "../emails/organization-invite-email";
 
 export const auth = betterAuth({
     user: {
@@ -88,7 +89,21 @@ export const auth = betterAuth({
             admin,
             user,
         }
-    }), organization()],
+    }), organization({
+        sendInvitationEmail: async ({
+            email,
+            organization,
+            inviter,
+            invitation
+        }) => {
+            await sendOrganizationInviteEmail({
+                invitation,
+                inviter: inviter.user,
+                organization,
+                email,
+            })
+        }
+    })],
     database: drizzleAdapter(db, {
         provider: "pg"
     }),

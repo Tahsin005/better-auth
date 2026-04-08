@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { authClient } from "@/lib/auth/auth-client"
 import { MembersTab } from "./members-tab"
+import { InvitesTab } from "./invites-tab"
 
 export function OrganizationTabs() {
     const { data: activeOrganization } = authClient.useActiveOrganization()
@@ -24,6 +25,7 @@ export function OrganizationTabs() {
                             </TabsContent>
 
                             <TabsContent value="invitations">
+                                <InvitesTab />
                             </TabsContent>
 
                             <TabsContent value="subscriptions">
