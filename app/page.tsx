@@ -43,6 +43,9 @@ export default function Home() {
               <Button asChild size="lg">
                 <Link href={'/profile'}>Profile</Link>
               </Button>
+              <Button variant="secondary" asChild size="lg">
+                <Link href={'/organizations'}>Organizations</Link>
+              </Button>
               {hasAdminPermission && (
                 <Button variant="outline" asChild size="lg">
                   <Link href="/admin">Admin</Link>

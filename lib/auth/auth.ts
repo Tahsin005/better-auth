@@ -7,7 +7,7 @@ import { sendPasswordResetEmail } from "../emails/password-reset-emai";
 import { createAuthMiddleware } from "better-auth/api";
 import { sendWelcomeEmail } from "../emails/welcome-email";
 import { sendDeleteAccountVerificationEmail } from "../emails/delete-account-verification";
-import { twoFactor, admin as adminPlugin } from "better-auth/plugins";
+import { twoFactor, admin as adminPlugin, organization } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey"
 import { ac, admin, user } from "@/components/auth/permissions"
 
@@ -88,7 +88,7 @@ export const auth = betterAuth({
             admin,
             user,
         }
-    })],
+    }), organization()],
     database: drizzleAdapter(db, {
         provider: "pg"
     }),
