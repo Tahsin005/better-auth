@@ -12,6 +12,7 @@ import { ChangePasswordForm } from "./_components/change-password-form";
 import { SetPasswordButton } from "./_components/set-password-button";
 import { SessionManagement } from "./_components/session-management";
 import { AccountLinking } from "./_components/account-linking";
+import { AccountDeletion } from "./_components/account-deletion";
 
 export default async function ProfilePage() {
     const session = await auth.api.getSession({
@@ -108,6 +109,16 @@ export default async function ProfilePage() {
                     <LoadingSuspense>
                         <LinkedAccountsTab />
                     </LoadingSuspense>
+                </TabsContent>
+                <TabsContent value="danger">
+                    <Card className="border border-destructive">
+                        <CardHeader>
+                        <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <AccountDeletion />
+                        </CardContent>
+                    </Card>
                 </TabsContent>
             </Tabs>
         </div>
