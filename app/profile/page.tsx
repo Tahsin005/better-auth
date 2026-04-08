@@ -15,6 +15,7 @@ import { AccountLinking } from "./_components/account-linking";
 import { AccountDeletion } from "./_components/account-deletion";
 import { Badge } from "@/components/ui/badge";
 import { TwoFactorAuth } from "./_components/two-factor-auth";
+import { PasskeyManagement } from "./_components/passkey-management";
 
 export default async function ProfilePage() {
     const session = await auth.api.getSession({
@@ -165,7 +166,10 @@ async function SecurityTab({
   email: string
   isTwoFactorEnabled: boolean
 }) {
-    const accounts = await auth.api.listUserAccounts({ headers: await headers() })
+    const [passkeys, accounts] = await Promise.all([
+        auth.api.listPasskeys({ headers: await headers() }),
+        auth.api.listUserAccounts({ headers: await headers() }),
+    ])
     const hasPasswordAccount = accounts.some(a => a.providerId === "credential")
     return (
         <div className="space-y-6">
@@ -208,6 +212,15 @@ async function SecurityTab({
                     </CardContent>
                 </Card>
             )}
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Passkeys</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <PasskeyManagement passkeys={passkeys} />
+                </CardContent>
+            </Card>
         </div>
     )
 }

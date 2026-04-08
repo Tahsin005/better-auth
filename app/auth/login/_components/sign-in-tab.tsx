@@ -19,6 +19,7 @@ import { LoadingSwap } from "@/components/ui/loading-swap";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { PasskeyButton } from "./passkey-button";
 
 const signInSchema = z.object({
     email: z.email().min(1),
@@ -60,48 +61,49 @@ export function SignInTab({
         })
     }
     return (
-        <form onSubmit={handleSubmit(handleSignIn)} className="space-y-6">
-            <FieldSet>
-                <FieldGroup>
-                    {/* email */}
-                    <Field>
-                        <FieldLabel>Email</FieldLabel>
-                        <FieldContent>
-                            <Input
-                                type="email"
-                                placeholder="Enter your email"
-                                {...register("email")}
-                            />
-                        </FieldContent>
-
-                        {errors.email && <FieldError>{errors.email.message}</FieldError>}
-                    </Field>
-
-                    {/* password */}
-                    <Field>
-                        <div className="flex justify-between items-center">
-                            <FieldLabel>Password</FieldLabel>
-                            <Button variant="link" size="sm" onClick={openForgotPassword}>
-                                Forgot Password?
-                            </Button>
-                        </div>
-                        <FieldContent>
-                            <PasswordInput
-                                placeholder="Enter your password"
-                                {...register("password")}
-                            />
-                        </FieldContent>
-
-                        {errors.password && <FieldError>{errors.password.message}</FieldError>}
-                    </Field>
-                </FieldGroup>
-            </FieldSet>
-
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-                <LoadingSwap isLoading={isSubmitting}>
-                    Sign In
-                </LoadingSwap>
-            </Button>
-        </form>
+        <div className="space-y-4">
+            <form onSubmit={handleSubmit(handleSignIn)} className="space-y-6">
+                <FieldSet>
+                    <FieldGroup>
+                        {/* email */}
+                        <Field>
+                            <FieldLabel>Email</FieldLabel>
+                            <FieldContent>
+                                <Input
+                                    autoComplete="email webauthn"
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    {...register("email")}
+                                />
+                            </FieldContent>
+                            {errors.email && <FieldError>{errors.email.message}</FieldError>}
+                        </Field>
+                        {/* password */}
+                        <Field>
+                            <div className="flex justify-between items-center">
+                                <FieldLabel>Password</FieldLabel>
+                                <Button variant="link" size="sm" onClick={openForgotPassword}>
+                                    Forgot Password?
+                                </Button>
+                            </div>
+                            <FieldContent>
+                                <PasswordInput
+                                    autoComplete="current-password webauthn"
+                                    placeholder="Enter your password"
+                                    {...register("password")}
+                                />
+                            </FieldContent>
+                            {errors.password && <FieldError>{errors.password.message}</FieldError>}
+                        </Field>
+                    </FieldGroup>
+                </FieldSet>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    <LoadingSwap isLoading={isSubmitting}>
+                        Sign In
+                    </LoadingSwap>
+                </Button>
+            </form>
+            <PasskeyButton />
+        </div>
     );
 }
