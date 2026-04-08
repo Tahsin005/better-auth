@@ -10,6 +10,7 @@ import { ProfileUpdateForm } from "./_components/profile-update-form";
 import { ReactNode, Suspense } from "react";
 import { ChangePasswordForm } from "./_components/change-password-form";
 import { SetPasswordButton } from "./_components/set-password-button";
+import { SessionManagement } from "./_components/session-management";
 
 export default async function ProfilePage() {
     const session = await auth.api.getSession({
@@ -93,8 +94,32 @@ export default async function ProfilePage() {
                         </CardContent>
                     </Card>
                 </TabsContent>
+                <TabsContent value="sessions">
+                    <Card>
+                        <CardContent>
+                            <LoadingSuspense>
+                                <SessionsTab currentSessionToken={session.session.token} />
+                            </LoadingSuspense>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
         </div>
+    )
+}
+
+async function SessionsTab({
+    currentSessionToken,
+}: {
+    currentSessionToken: string
+}) {
+    const sessions = await auth.api.listSessions({ headers: await headers() })
+
+    return (
+        <SessionManagement
+            sessions={sessions}
+            currentSessionToken={currentSessionToken}
+        />
     )
 }
 
