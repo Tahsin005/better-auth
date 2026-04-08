@@ -13,6 +13,8 @@ import { SetPasswordButton } from "./_components/set-password-button";
 import { SessionManagement } from "./_components/session-management";
 import { AccountLinking } from "./_components/account-linking";
 import { AccountDeletion } from "./_components/account-deletion";
+import { Badge } from "@/components/ui/badge";
+import { TwoFactorAuth } from "./_components/two-factor-auth";
 
 export default async function ProfilePage() {
     const session = await auth.api.getSession({
@@ -91,6 +93,7 @@ export default async function ProfilePage() {
                             <LoadingSuspense>
                                 <SecurityTab
                                     email={session.user.email}
+                                    isTwoFactorEnabled={session.user.twoFactorEnabled ?? false}
                                 />
                             </LoadingSuspense>
                         </CardContent>
@@ -157,8 +160,10 @@ async function SessionsTab({
 
 async function SecurityTab({
   email,
+  isTwoFactorEnabled
 }: {
   email: string
+  isTwoFactorEnabled: boolean
 }) {
     const accounts = await auth.api.listUserAccounts({ headers: await headers() })
     const hasPasswordAccount = accounts.some(a => a.providerId === "credential")
@@ -186,6 +191,20 @@ async function SecurityTab({
                     </CardHeader>
                     <CardContent>
                         <SetPasswordButton email={email} />
+                    </CardContent>
+                </Card>
+            )}
+
+            {hasPasswordAccount && (
+                <Card>
+                    <CardHeader className="flex items-center justify-between gap-2">
+                        <CardTitle>Two-Factor Authentication</CardTitle>
+                        <Badge variant={isTwoFactorEnabled ? "default" : "secondary"}>
+                            {isTwoFactorEnabled ? "Enabled" : "Disabled"}
+                        </Badge>
+                    </CardHeader>
+                    <CardContent>
+                        <TwoFactorAuth isEnabled={isTwoFactorEnabled} />
                     </CardContent>
                 </Card>
             )}
