@@ -3,6 +3,7 @@ import { passkeyClient } from "@better-auth/passkey/client";
 import { createAuthClient } from "better-auth/react";
 import { auth } from "./auth";
 import { ac, admin, user } from "@/components/auth/permissions";
+import { stripeClient } from "@better-auth/stripe/client";
 
 export const authClient = createAuthClient({
     plugins: [
@@ -21,5 +22,8 @@ export const authClient = createAuthClient({
             }
         }),
         organizationClient(),
+        stripeClient({
+            subscription: true
+        })
     ],
 })
